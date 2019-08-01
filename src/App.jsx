@@ -10,7 +10,8 @@ export default class App extends PureComponent {
           squares: Array(9).fill(null)
         }
       ],
-      xIsNext: true
+      xIsNext: true,
+      stepNumber: 0
     };
 
     this.calculateWinner = this.calculateWinner.bind(this);
@@ -43,7 +44,7 @@ export default class App extends PureComponent {
   }
 
   handleClick(i) {
-    const history = this.state.history;
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (this.calculateWinner(squares) || squares[i]) {
@@ -57,13 +58,21 @@ export default class App extends PureComponent {
           squares: squares
         }
       ]),
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     });
   }
 
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step,
+      xIsNext: (step % 2) === 0,
+    })
+  }
+
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.stepNumber];
     const winner = this.calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
